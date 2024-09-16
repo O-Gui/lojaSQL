@@ -91,5 +91,17 @@ FROM cliente
 JOIN pedido ON cliente.clinte_ID = pedido.clinte_ID
 WHERE pedido.status = 'enviado';
 
+-- Alterar o status do cliente 'Carlos Souza'
 
+update cliente set status = inativo
+where clinte_ID = 3;
+
+-- Alterar o status do pedido do cliente 'Carlos Souza' para 'enviado';
+
+update pedido set status = enviado
+where clinte_ID = 3;
+
+-- ○ Excluir o pedido do cliente 'João Silva'.
+
+delete from cliente where clinte_ID = 1;
 
