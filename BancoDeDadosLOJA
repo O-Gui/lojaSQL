@@ -1,0 +1,95 @@
+-- criando banco de dados
+
+create database loja;
+
+-- criando tabela cliente
+create table cliente(
+clinte_ID int unsigned auto_increment primary key,
+nome varchar (100) not null,
+email varchar (100) not null unique,
+endereco varchar (100) not null,
+nascimento date not null check (nascimento > '1900-01-01'), 
+status enum('ativo','inativo') not null default 'ativo'
+);
+
+-- visualisa a tabela cliente
+
+select * from cliente;
+
+create table pedido(
+pedido_ID int unsigned auto_increment primary key,
+clinte_ID int unsigned not null,
+data_pedido date not null check (data_pedido > '1900-01-01'),
+valor_total decimal(10,2) not null default 0,
+status enum('pendente','processado','enviado','entregue') not null default 'pendente',
+foreign key (clinte_ID) references cliente (clinte_ID) on delete cascade,
+index (clinte_ID)
+);
+
+select * from pedido;
+
+INSERT INTO cliente (nome, email, endereco, nascimento, status)
+VALUES ('João da Silva', 'joao.silva@email.com', 'Rua A, 123 São Paulo, SP', '1985-06-15', 'ativo'),
+('Maria Oliveira', 'maria.oliveira@email.com', 'AV. B, 456, Rio de Janeiro, RJ', '1990-12-22', 'ativo'),
+('carlos souza', 'carlos.souza@email.com', 'Rua C, 789 Belo Horizonte, MG', '1978-03-30', 'inativo');
+
+INSERT INTO pedido (clinte_ID, data_pedido, valor_total, status)
+VALUES  (1, '2024-09-10', 150.75, 'processado'),
+(2, '2024-09-11', 299.99, 'enviado'),
+(3, '2024-09-12', 50.00, 'pendente');
+
+-- quebrando restricoes
+
+insert into clinte (nome, email, endereco, nascimento, status)
+values ('joão silva', 'joao2.silva@email.com', 'rua B', '1800-06-17','teste');
+
+-- Consultar todos os clientes cadastrados
+
+select * from cliente;
+
+-- Consultar os pedidos feitos por um cliente específico
+
+SELECT * FROM pedido
+WHERE clinte_ID = 1;
+
+-- Listar todos os clientes que estão com status ativo
+
+SELECT * FROM cliente
+WHERE status = 'ativo';
+
+-- Listar todos os pedidos feitos em um intervalo de datas, por exemplo, entre 10 de setembro de 2024 e 12 de setembro de 2024
+
+SELECT * FROM pedido
+WHERE data_pedido BETWEEN '2024-09-10' AND '2024-09-12';
+
+-- Consultar os clientes que fizeram pedido de valor total maior que R$ 200,00
+
+SELECT * FROM cliente
+WHERE clinte_ID IN (
+    SELECT clinte_ID 
+    FROM pedido
+    WHERE valor_total > 200.00
+);
+
+-- Consultar os 3 pedidos mais recentes
+
+SELECT * 
+FROM pedido
+ORDER BY data_pedido DESC
+LIMIT 3;
+
+-- Listar todos os pedidos com informações detalhadas do cliente nome e e-mail
+
+SELECT pedido.pedido_ID, pedido.data_pedido, pedido.valor_total, pedido.status, cliente.nome, cliente.email
+FROM pedido
+JOIN cliente ON pedido.clinte_ID = cliente.clinte_ID;
+
+-- Listar todos os clientes que fizeram pedidos com status "enviado", retornando o nome e email
+
+SELECT DISTINCT cliente.nome, cliente.email
+FROM cliente
+JOIN pedido ON cliente.clinte_ID = pedido.clinte_ID
+WHERE pedido.status = 'enviado';
+
+
+
